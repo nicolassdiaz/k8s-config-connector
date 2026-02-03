@@ -1,0 +1,34 @@
+# Development environment for k8s-config-connector on macOS
+# This provides a Linux environment with all the required tools
+
+FROM golang:1.24.6
+
+# Install required system dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    make \
+    wget \
+    curl \
+    jq \
+    build-essential \
+    sudo \
+    unzip \
+    protobuf-compiler \
+    python3 \
+    python3-pip \
+    && pip3 install --break-system-packages pyyaml \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install kustomize
+ARG KUSTOMIZE_VERSION=3.5.4
+RUN curl -O -L https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize%2Fv${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz && \
+    tar -zxvf kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz && \
+    chmod a+x kustomize && \
+    mv kustomize /usr/local/bin/kustomize && \
+    rm kustomize_v${KUSTOMIZE_VERSION}_linux_amd64.tar.gz
+
+# Set working directory
+WORKDIR /workspace
+
+# Default command
+CMD ["/bin/bash"]
